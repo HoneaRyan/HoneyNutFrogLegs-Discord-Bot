@@ -11,6 +11,7 @@ tokens.py
 
 # Distribution / packaging
 .Python
+tuna-images/
 build/
 develop-eggs/
 dist/

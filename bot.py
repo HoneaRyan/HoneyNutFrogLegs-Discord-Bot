@@ -1,6 +1,7 @@
 import discord
 import random
 import string
+import glob
 from tokens import BOT_SECRET
 
 intents = discord.Intents.default()
@@ -25,6 +26,14 @@ async def on_message(message):
         await message.channel.send(''.join(tuna_message))
 
     if message.content.startswith('!give-treat'):
-        await message.channel.send('meow', {files: ["https://i.imgur.com/XxxXxXX.jpg"]})
+        file_path_type = "tuna-images\\*.jpg"
+        images = glob.glob(file_path_type)
+        with open(str(random.choice(images)), 'rb') as f:
+            picture = discord.File(f)
+            if (message.author.nick != None):
+                await message.channel.send('Thanks {}!'.format(message.author.nick), file=picture)
+            else:
+                await message.channel.send('Thanks {}!'.format(message.author.name), file=picture)
+
 
 client.run(BOT_SECRET)
