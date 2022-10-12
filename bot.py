@@ -1,6 +1,7 @@
 import discord
 import random
 import string
+from tokens import BOT_SECRET
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -24,6 +25,6 @@ async def on_message(message):
         await message.channel.send(''.join(tuna_message))
 
     if message.content.startswith('!give-treat'):
-        await message.channel.send('meow')
+        await message.channel.send('meow', {files: ["https://i.imgur.com/XxxXxXX.jpg"]})
 
-client.run('MTAyOTU0MTgzNDYwMDQ4MDc3OQ.G_UL1B.e8NfCJeFoWASRPoKu-2VrSld8M_Bc_doMNIAYc')
+client.run(BOT_SECRET)
