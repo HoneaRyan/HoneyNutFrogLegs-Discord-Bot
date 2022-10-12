@@ -3,6 +3,8 @@ import random
 import string
 import glob
 from tokens import BOT_SECRET
+from helper_functions import process_name
+from db_manage import create_connection, get_treats, update_treats, get_treaterboard
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -25,15 +27,56 @@ async def on_message(message):
 
         await message.channel.send(''.join(tuna_message))
 
+    if message.content.startswith('!treaterboard'):
+        conn = create_connection()
+        res = get_treaterboard(conn)
+        if len(res) <= 10:
+            nbr_display = len(res)
+        else:  
+            nbr_display = 10
+        name_list = []
+        for i in range(nbr_display):
+            user = await client.fetch_user(res[i][0])
+            name_list.append(str(i+1) + ': ' + user.display_name)
+        score_list = ['{}'.format(res[i][1]) for i in range(nbr_display)]
+        
+
+        embed = {
+            'title' : 'Treaterboard',
+            'type' : 'rich',
+            'fields' : [
+                {
+                    'name' : 'Tuna\'s Top {}'.format(nbr_display),
+                    'value' : '\n'.join(name_list),
+                    'inline' : True
+                },
+                {
+                    'name' : 'Treats',
+                    'value': '\n'.join(score_list),
+                    'inline' : True
+                }
+            ]
+        }
+        await message.channel.send(embed = discord.Embed.from_dict(embed))
+
+
     if message.content.startswith('!give-treat'):
         file_path_type = "tuna-images\\*.jpg"
         images = glob.glob(file_path_type)
-        with open(str(random.choice(images)), 'rb') as f:
-            picture = discord.File(f)
-            if (message.author.nick != None):
-                await message.channel.send('Thanks {}!'.format(message.author.nick), file=picture)
-            else:
-                await message.channel.send('Thanks {}!'.format(message.author.name), file=picture)
+        conn = create_connection()
+        id = message.author.id
+        mess, nbr_treats = get_treats(conn, id)
+        if (mess != ''):
+            await message.channel.send(mess)
+        else: 
+            update_treats(conn, id, nbr_treats + 1)
+            with open(str(random.choice(images)), 'rb') as f:
+                picture = discord.File(f)
+                if (message.author.nick != None):
+                    await message.channel.send('Thanks {}! You have given me {} treats!'.format(message.author.nick, nbr_treats + 1), file=picture)
+                else:
+                    await message.channel.send('Thanks {}! You have given me {} treats!'.format(message.author.name, nbr_treats + 1), file=picture)
+            conn.commit()
 
 
 client.run(BOT_SECRET)
