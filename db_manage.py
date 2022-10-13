@@ -38,8 +38,9 @@ def _query(conn, qry):
 
 def get_treaterboard(conn):
     qry = """
-        SELECT id, num_treats
+        SELECT id, num_treats,last_treat
         from treats
+        where id <> '375863038755995648'
         order by num_treats desc
     """
     return _query(conn, qry)

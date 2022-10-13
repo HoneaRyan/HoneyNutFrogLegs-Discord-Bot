@@ -68,16 +68,17 @@ async def on_message(message):
         if name == 'Sabertooth18':
             await message.channel.send('no dick pic for you')
         mess, nbr_treats = get_treats(conn, id)
-        if (mess != ''):
+        if ((mess != '') & (name != 'Honeabear')):
             await message.channel.send(mess)
         else: 
+            treat_spill = random.randint(2,5) if random.randint(1,10) == 10 else 1
+            if treat_spill > 1:
+                mess = 'You spilled the treat jar and spilled {} treats!\n'.format(treat_spill)
+            mess = mess + 'Thanks {}! You have given me {} treats!'
             update_treats(conn, id, nbr_treats + 1)
             with open(str(random.choice(images)), 'rb') as f:
                 picture = discord.File(f)
-                if (message.author.nick != None):
-                    await message.channel.send('Thanks {}! You have given me {} treats!'.format(message.author.nick, nbr_treats + 1), file=picture)
-                else:
-                    await message.channel.send('Thanks {}! You have given me {} treats!'.format(message.author.name, nbr_treats + 1), file=picture)
+                await message.channel.send(mess.format(message.author.display_name, nbr_treats + treat_spill), file=picture)
             conn.commit()
 
 
