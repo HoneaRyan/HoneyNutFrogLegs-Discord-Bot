@@ -3,7 +3,6 @@ import random
 import string
 import glob
 from tokens import BOT_SECRET
-from helper_functions import process_name
 from db_manage import create_connection, get_treats, update_treats, get_treaterboard
 
 intents = discord.Intents.default()
@@ -65,6 +64,9 @@ async def on_message(message):
         images = glob.glob(file_path_type)
         conn = create_connection()
         id = message.author.id
+        name = message.author.name
+        if name == 'Sabertooth18':
+            await message.channel.send('no dick pic for you')
         mess, nbr_treats = get_treats(conn, id)
         if (mess != ''):
             await message.channel.send(mess)
